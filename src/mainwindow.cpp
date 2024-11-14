@@ -54,12 +54,13 @@ Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
 // TODO: depends on tab insertion order, a better solution would be to use object names
 const QMap<int, QString> panelSettingMap({
         {0, "Port"},
-        {1, "DataFormat"},
-        {2, "Plot"},
-        {3, "Commands"},
-        {4, "Record"},
-        {5, "TextView"},
-        {6, "Log"}
+        {1, "Net"},
+        {2, "DataFormat"},
+        {3, "Plot"},
+        {4, "Commands"},
+        {5, "Record"},
+        {6, "TextView"},
+        {7, "Log"}
     });
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -67,10 +68,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     aboutDialog(this),
     portControl(&serialPort),
+    netControl(&tcpClient),
     secondaryPlot(NULL),
     snapshotMan(this, &stream),
     commandPanel(&serialPort),
-    dataFormatPanel(&serialPort),
+    dataFormatPanel(&tcpClient),
     recordPanel(&stream),
     textView(&stream),
     updateCheckDialog(this),
@@ -81,14 +83,17 @@ MainWindow::MainWindow(QWidget *parent) :
     plotMan = new PlotManager(ui->plotArea, &plotMenu, &stream);
 
     ui->tabWidget->insertTab(0, &portControl, "Port");
-    ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
-    ui->tabWidget->insertTab(2, &plotControlPanel, "Plot");
-    ui->tabWidget->insertTab(3, &commandPanel, "Commands");
-    ui->tabWidget->insertTab(4, &recordPanel, "Record");
-    ui->tabWidget->insertTab(5, &textView, "Text View");
+    ui->tabWidget->insertTab(1, &netControl, "Net");
+    ui->tabWidget->insertTab(2, &dataFormatPanel, "Data Format");
+    ui->tabWidget->insertTab(3, &plotControlPanel, "Plot");
+    ui->tabWidget->insertTab(4, &commandPanel, "Commands");
+    ui->tabWidget->insertTab(5, &recordPanel, "Record");
+    ui->tabWidget->insertTab(6, &textView, "Text View");
     ui->tabWidget->setCurrentIndex(0);
     auto tbPortControl = portControl.toolBar();
     addToolBar(tbPortControl);
+    auto tbNetControl = netControl.toolBar();
+    addToolBar(tbNetControl);
     addToolBar(recordPanel.toolbar());
 
     ui->plotToolBar->addAction(snapshotMan.takeSnapshotAction());
@@ -102,6 +107,7 @@ MainWindow::MainWindow(QWidget *parent) :
             });
 
     tbPortControl->setObjectName("tbPortControl");
+    tbNetControl->setObjectName("tbNetControl");
     ui->plotToolBar->setObjectName("tbPlot");
 
     setupAboutDialog();
@@ -530,6 +536,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
 {
     saveMWSettings(settings);
     portControl.saveSettings(settings);
+    netControl.saveSettings(settings);
     dataFormatPanel.saveSettings(settings);
     stream.saveSettings(settings);
     plotControlPanel.saveSettings(settings);
@@ -544,6 +551,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
 {
     loadMWSettings(settings);
     portControl.loadSettings(settings);
+    netControl.loadSettings(settings);
     dataFormatPanel.loadSettings(settings);
     stream.loadSettings(settings);
     plotControlPanel.loadSettings(settings);

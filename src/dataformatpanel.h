@@ -44,7 +44,7 @@ class DataFormatPanel : public QWidget
     Q_OBJECT
 
 public:
-    explicit DataFormatPanel(QSerialPort* port, QWidget* parent = 0);
+    explicit DataFormatPanel(QIODevice* device, QWidget* parent = 0);
     ~DataFormatPanel();
 
     /// Returns currently selected number of channels
@@ -69,8 +69,6 @@ signals:
 private:
     Ui::DataFormatPanel *ui;
     QButtonGroup readerSelectButtons;
-
-    QSerialPort* serialPort;
 
     BinaryStreamReader bsReader;
     AsciiReader asciiReader;

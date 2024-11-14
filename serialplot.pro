@@ -41,6 +41,7 @@ SOURCES += \
     src/main.cpp \
     src/mainwindow.cpp \
     src/portcontrol.cpp \
+    src/netcontrol.cpp \
     src/plot.cpp \
     src/zoomer.cpp \
     src/scrollzoomer.cpp \
@@ -102,6 +103,7 @@ HEADERS += \
     src/mainwindow.h \
     src/utils.h \
     src/portcontrol.h \
+    src/netcontrol.h \
     src/byteswap.h \
     src/plot.h \
     src/hidabletabwidget.h \
@@ -168,6 +170,7 @@ FORMS += \
     src/mainwindow.ui \
     src/about_dialog.ui \
     src/portcontrol.ui \
+    src/netcontrol.ui \
     src/snapshotview.ui \
     src/commandpanel.ui \
     src/commandwidget.ui \

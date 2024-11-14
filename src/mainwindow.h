@@ -27,6 +27,7 @@
 #include <QVector>
 #include <QList>
 #include <QSerialPort>
+#include <QTcpSocket>
 #include <QSignalMapper>
 #include <QTimer>
 #include <QColor>
@@ -35,6 +36,7 @@
 #include <qwt_plot_curve.h>
 
 #include "portcontrol.h"
+#include "netcontrol.h"
 #include "commandpanel.h"
 #include "dataformatpanel.h"
 #include "plotcontrolpanel.h"
@@ -72,7 +74,9 @@ private:
     void setupAboutDialog();
 
     QSerialPort serialPort;
+    QTcpSocket tcpClient;
     PortControl portControl;
+    NETControl netControl;
 
     unsigned int numOfSamples;
 
