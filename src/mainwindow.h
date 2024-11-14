@@ -76,7 +76,7 @@ private:
     QSerialPort serialPort;
     QTcpSocket tcpClient;
     PortControl portControl;
-    NETControl netControl;
+    NetControl netControl;
 
     unsigned int numOfSamples;
 

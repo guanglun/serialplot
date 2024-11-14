@@ -29,8 +29,8 @@
 #include "setting_defines.h"
 #include "utils.h"
 
-NETControl::NETControl(QTcpSocket *client, QWidget *parent) : QWidget(parent),
-                                                              ui(new Ui::NETControl),
+NetControl::NetControl(QTcpSocket *client, QWidget *parent) : QWidget(parent),
+                                                              ui(new Ui::NetControl),
                                                               netToolBar("Net Toolbar"),
                                                               openAction("Open", this)
 {
@@ -43,7 +43,7 @@ NETControl::NETControl(QTcpSocket *client, QWidget *parent) : QWidget(parent),
     // openAction.setShortcut(QKeySequence("F12"));
     openAction.setToolTip("Net");
     QObject::connect(&openAction, &QAction::triggered,
-                     this, &NETControl::openActionTriggered);
+                     this, &NetControl::openActionTriggered);
 
     netToolBar.addAction(&openAction);
 
@@ -55,12 +55,12 @@ NETControl::NETControl(QTcpSocket *client, QWidget *parent) : QWidget(parent),
     //connect(tcpclient, &QTcpSocket::readyRead, this, &MainWindow::tcpclientreaddata);
 }
 
-NETControl::~NETControl()
+NetControl::~NetControl()
 {
     delete ui;
 }
 
-void NETControl::openActionTriggered(bool checked)
+void NetControl::openActionTriggered(bool checked)
 {
     QString ip = ui->leNetIP->text();
     int port = ui->leNetPort->text().toInt();
@@ -73,7 +73,7 @@ void NETControl::openActionTriggered(bool checked)
     {
         tcpClient->connectToHost(ip, port);
 
-        if (!tcpClient->waitForConnected(100))
+        if (!tcpClient->waitForConnected(1000))
         {
             qDebug() << "Connection failed!";
 
@@ -83,6 +83,7 @@ void NETControl::openActionTriggered(bool checked)
         }
 
         openAction.setChecked(true);
+        emit selectReaderDevice(1);
 
     }else{
         tcpClient->close();
@@ -90,12 +91,12 @@ void NETControl::openActionTriggered(bool checked)
     }
 }
 
-QToolBar *NETControl::toolBar()
+QToolBar *NetControl::toolBar()
 {
     return &netToolBar;
 }
 
-void NETControl::saveSettings(QSettings* settings)
+void NetControl::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_Net);
     settings->setValue(SG_Net_IP, ui->leNetIP->text());
@@ -103,7 +104,7 @@ void NETControl::saveSettings(QSettings* settings)
     settings->endGroup();
 }
 
-void NETControl::loadSettings(QSettings* settings)
+void NetControl::loadSettings(QSettings* settings)
 {
 
     settings->beginGroup(SettingGroup_Net);

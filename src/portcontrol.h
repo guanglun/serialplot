@@ -102,6 +102,7 @@ private slots:
 
 signals:
     void portToggled(bool open);
+    void selectReaderDevice(int device);
 };
 
 #endif // PORTCONTROL_H

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NETControl</class>
- <widget class="QWidget" name="NETControl">
+ <class>NetControl</class>
+ <widget class="QWidget" name="NetControl">
   <property name="geometry">
    <rect>
     <x>0</x>

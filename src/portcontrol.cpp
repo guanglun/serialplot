@@ -314,6 +314,7 @@ void PortControl::togglePort()
             pinUpdateTimer.start();
 
             qDebug() << "Opened port:" << serialPort->portName();
+            emit selectReaderDevice(0);
             emit portToggled(true);
         }
     }

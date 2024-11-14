@@ -31,16 +31,16 @@
 #include <QTimer>
 
 namespace Ui {
-class NETControl;
+class NetControl;
 }
 
-class NETControl : public QWidget
+class NetControl : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit NETControl(QTcpSocket *tcpClient, QWidget* parent = 0);
-    ~NETControl();
+    explicit NetControl(QTcpSocket *tcpClient, QWidget* parent = 0);
+    ~NetControl();
 
     QTcpSocket *tcpClient;
     QToolBar* toolBar();
@@ -51,7 +51,7 @@ public:
     void loadSettings(QSettings* settings);
 
 private:
-    Ui::NETControl *ui;
+    Ui::NetControl *ui;
 
     QToolBar netToolBar;
     QAction openAction;
@@ -61,7 +61,7 @@ private slots:
     void openActionTriggered(bool checked);
 
 signals:
-
+    void selectReaderDevice(int device);
 };
 
 #endif // NETCONTROL_H

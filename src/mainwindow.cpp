@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
     secondaryPlot(NULL),
     snapshotMan(this, &stream),
     commandPanel(&serialPort),
-    dataFormatPanel(&tcpClient),
+    dataFormatPanel(&serialPort,&tcpClient),
     recordPanel(&stream),
     textView(&stream),
     updateCheckDialog(this),
@@ -127,6 +127,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // init UI signals
 
     // Secondary plot menu signals
+
+    QObject::connect(ui->actionExportSvg, &QAction::triggered,
+                     this, &MainWindow::onExportSvg);
+
     connect(ui->actionBarPlot, &QAction::triggered,
             this, &MainWindow::showBarPlot);
 
@@ -143,8 +147,11 @@ MainWindow::MainWindow(QWidget *parent) :
             });
 
     // Help menu signals
-    QObject::connect(ui->actionHelpAbout, &QAction::triggered,
-              &aboutDialog, &QWidget::show);
+    QObject::connect(&portControl, &PortControl::selectReaderDevice,
+              &dataFormatPanel, &DataFormatPanel::selectReaderDevice);
+
+    QObject::connect(&netControl, &NetControl::selectReaderDevice,
+              &dataFormatPanel, &DataFormatPanel::selectReaderDevice);
 
     QObject::connect(ui->actionCheckUpdate, &QAction::triggered,
               &updateCheckDialog, &QWidget::show);

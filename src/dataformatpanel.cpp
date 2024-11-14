@@ -26,25 +26,30 @@
 #include "utils.h"
 #include "setting_defines.h"
 
-DataFormatPanel::DataFormatPanel(QIODevice* device, QWidget *parent) :
+DataFormatPanel::DataFormatPanel(QIODevice* serial,QIODevice* tcp, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DataFormatPanel),
-    bsReader(device, this),
-    asciiReader(device, this),
-    framedReader(device, this),
-    demoReader(device, this)
+    bsReaderSerial(serial, this),
+    asciiReaderSerial(serial, this),
+    framedReaderSerial(serial, this),
+    demoReaderSerial(serial, this),
+    bsReaderNet(tcp, this),
+    asciiReaderNet(tcp, this),
+    framedReaderNet(tcp, this),
+    demoReaderNet(tcp, this)
 {
     ui->setupUi(this);
 
+    selectDeviceType = 0;
     paused = false;
     readerBeforeDemo = nullptr;
     _bytesRead = 0;
 
     // initalize default reader
-    currentReader = &bsReader;
-    bsReader.enable();
+    currentReader = &bsReaderSerial;
+    bsReaderSerial.enable();
     ui->rbBinary->setChecked(true);
-    ui->horizontalLayout->addWidget(bsReader.settingsWidget(), 1);
+    ui->horizontalLayout->addWidget(bsReaderSerial.settingsWidget(), 1);
 
     // initalize reader selection buttons
     readerSelectButtons.addButton(ui->rbBinary);
@@ -53,17 +58,34 @@ DataFormatPanel::DataFormatPanel(QIODevice* device, QWidget *parent) :
 
     connect(ui->rbBinary, &QRadioButton::toggled, [this](bool checked)
             {
-                if (checked) selectReader(&bsReader);
+                if (checked) 
+                {
+                    if(selectDeviceType == 0)
+                        selectReader(&bsReaderSerial);
+                    else
+                        selectReader(&bsReaderNet);
+                }
             });
 
     connect(ui->rbAscii, &QRadioButton::toggled, [this](bool checked)
             {
-                if (checked) selectReader(&asciiReader);
+                if (checked)
+                {
+                    if(selectDeviceType == 0)
+                        selectReader(&asciiReaderSerial);
+                    else
+                        selectReader(&asciiReaderNet);
+                }
             });
 
     connect(ui->rbFramed, &QRadioButton::toggled, [this](bool checked)
             {
-                if (checked) selectReader(&framedReader);
+                if (checked) {
+                    if(selectDeviceType == 0)
+                        selectReader(&framedReaderSerial);
+                    else
+                        selectReader(&framedReaderNet);
+                }
             });
 }
 
@@ -86,7 +108,7 @@ void DataFormatPanel::pause(bool enabled)
 {
     paused = enabled;
     currentReader->pause(enabled);
-    demoReader.pause(enabled);
+    demoReaderSerial.pause(enabled);
 }
 
 void DataFormatPanel::enableDemo(bool demoEnabled)
@@ -94,8 +116,8 @@ void DataFormatPanel::enableDemo(bool demoEnabled)
     if (demoEnabled)
     {
         readerBeforeDemo = currentReader;
-        demoReader.setNumChannels(readerBeforeDemo->numChannels());
-        selectReader(&demoReader);
+        demoReaderSerial.setNumChannels(readerBeforeDemo->numChannels());
+        selectReader(&demoReaderSerial);
     }
     else
     {
@@ -111,7 +133,39 @@ void DataFormatPanel::enableDemo(bool demoEnabled)
 
 bool DataFormatPanel::isDemoEnabled() const
 {
-    return currentReader == &demoReader;
+    return currentReader == &demoReaderSerial;
+}
+
+void DataFormatPanel::selectReaderDevice(int deviceType)
+{
+    qDebug() << "selectReaderDevice" << deviceType;
+    selectDeviceType = deviceType;
+
+    if(selectDeviceType == 0)
+    {
+        if(currentReader == &bsReaderNet)
+        {
+            selectReader(&bsReaderSerial);
+        }else if(currentReader == &asciiReaderNet)
+        {
+            selectReader(&asciiReaderSerial);
+        }else if(currentReader == &framedReaderNet)
+        {
+            selectReader(&framedReaderSerial);
+        }
+    }else if(selectDeviceType == 1)
+    {
+        if(currentReader == &bsReaderSerial)
+        {
+            selectReader(&bsReaderNet);
+        }else if(currentReader == &asciiReaderSerial)
+        {
+            selectReader(&asciiReaderNet);
+        }else if(currentReader == &framedReaderSerial)
+        {
+            selectReader(&framedReaderNet);
+        }
+    }
 }
 
 void DataFormatPanel::selectReader(AbstractReader* reader)
@@ -147,11 +201,11 @@ void DataFormatPanel::saveSettings(QSettings* settings)
     // save selected data format (current reader)
     QString format;
     AbstractReader* selectedReader = isDemoEnabled() ? readerBeforeDemo : currentReader;
-    if (selectedReader == &bsReader)
+    if (selectedReader == &bsReaderSerial || selectedReader == &bsReaderNet)
     {
         format = "binary";
     }
-    else if (selectedReader == &asciiReader)
+    else if (selectedReader == &asciiReaderSerial || selectedReader == &asciiReaderNet)
     {
         format = "ascii";
     }
@@ -164,9 +218,9 @@ void DataFormatPanel::saveSettings(QSettings* settings)
     settings->endGroup();
 
     // save reader settings
-    bsReader.saveSettings(settings);
-    asciiReader.saveSettings(settings);
-    framedReader.saveSettings(settings);
+    bsReaderSerial.saveSettings(settings);
+    asciiReaderSerial.saveSettings(settings);
+    framedReaderSerial.saveSettings(settings);
 }
 
 void DataFormatPanel::loadSettings(QSettings* settings)
@@ -179,24 +233,24 @@ void DataFormatPanel::loadSettings(QSettings* settings)
 
     if (format == "binary")
     {
-        selectReader(&bsReader);
+        selectReader(&bsReaderSerial);
         ui->rbBinary->setChecked(true);
     }
     else if (format == "ascii")
     {
-        selectReader(&asciiReader);
+        selectReader(&asciiReaderSerial);
         ui->rbAscii->setChecked(true);
     }
     else if (format == "custom")
     {
-        selectReader(&framedReader);
+        selectReader(&framedReaderSerial);
         ui->rbFramed->setChecked(true);
     } // else current selection stays
 
     settings->endGroup();
 
     // load reader settings
-    bsReader.loadSettings(settings);
-    asciiReader.loadSettings(settings);
-    framedReader.loadSettings(settings);
+    bsReaderSerial.loadSettings(settings);
+    asciiReaderSerial.loadSettings(settings);
+    framedReaderSerial.loadSettings(settings);
 }

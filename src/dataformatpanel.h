@@ -44,7 +44,7 @@ class DataFormatPanel : public QWidget
     Q_OBJECT
 
 public:
-    explicit DataFormatPanel(QIODevice* device, QWidget* parent = 0);
+    explicit DataFormatPanel(QIODevice* serial,QIODevice* tcp, QWidget* parent = 0);
     ~DataFormatPanel();
 
     /// Returns currently selected number of channels
@@ -61,6 +61,7 @@ public:
 public slots:
     void pause(bool);
     void enableDemo(bool); // demo shouldn't be enabled when port is open
+    void selectReaderDevice(int deviceType);
 
 signals:
     /// Active (selected) reader has changed.
@@ -70,18 +71,25 @@ private:
     Ui::DataFormatPanel *ui;
     QButtonGroup readerSelectButtons;
 
-    BinaryStreamReader bsReader;
-    AsciiReader asciiReader;
-    FramedReader framedReader;
+    BinaryStreamReader bsReaderSerial;
+    AsciiReader asciiReaderSerial;
+    FramedReader framedReaderSerial;
+
+    BinaryStreamReader bsReaderNet;
+    AsciiReader asciiReaderNet;
+    FramedReader framedReaderNet;
+
     /// Currently selected reader
     AbstractReader* currentReader;
     /// Disable current reader and enable a another one
     void selectReader(AbstractReader* reader);
 
+    int selectDeviceType;
     bool paused;
     uint64_t _bytesRead;
 
-    DemoReader demoReader;
+    DemoReader demoReaderSerial;
+    DemoReader demoReaderNet;
     AbstractReader* readerBeforeDemo;
 
     bool isDemoEnabled() const;
