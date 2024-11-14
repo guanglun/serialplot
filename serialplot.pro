@@ -183,7 +183,7 @@ FORMS += \
     src/demoreadersettings.ui \
     src/datatextview.ui
 
-INCLUDEPATH += qmake/ src/
+INCLUDEPATH += qmake/ src/ E:\Desktop\code\serialplot_project\qwt-6.1.6\src
 
 CONFIG += c++11
 
@@ -192,3 +192,6 @@ RESOURCES += misc/icons.qrc
 win32 {
     RESOURCES += misc/winicons.qrc
 }
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../qwt-6.1.6/build/Desktop_Qt_5_15_2_MinGW_64_bit-Release/lib -lqwt
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../qwt-6.1.6/build/Desktop_Qt_5_15_2_MinGW_64_bit-Release/lib -lqwtd
