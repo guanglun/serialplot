@@ -57,9 +57,8 @@ private:
     QAction openAction;
 
 private slots:
-
     void openActionTriggered(bool checked);
-
+    void btnSendCallback();
 signals:
     void selectReaderDevice(int device);
 };

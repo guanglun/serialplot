@@ -113,6 +113,26 @@
       </widget>
      </item>
      <item>
+      <widget class="QLineEdit" name="leCmd"/>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cbAddReturn">
+       <property name="text">
+        <string>Add Return</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbSendCmd">
+       <property name="text">
+        <string>Send</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>

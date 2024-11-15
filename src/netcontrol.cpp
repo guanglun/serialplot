@@ -50,7 +50,10 @@ NetControl::NetControl(QTcpSocket *client, QWidget *parent) : QWidget(parent),
     ui->pbNetOpen->setDefaultAction(&openAction);
 
     // ui->leNetIP->setInputMask("000.000.000.000; ");  
-    ui->leNetPort->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));   
+    ui->leNetPort->setValidator(new QRegExpValidator(QRegExp("[0-9]+$")));
+
+
+    connect(ui->pbSendCmd ,SIGNAL(clicked()),this,SLOT(btnSendCallback()));
 
     //connect(tcpclient, &QTcpSocket::readyRead, this, &MainWindow::tcpclientreaddata);
 }
@@ -122,4 +125,18 @@ void NetControl::loadSettings(QSettings* settings)
     }
 
     settings->endGroup();
+}
+
+void NetControl::btnSendCallback()
+{
+    if(tcpClient->state() == QAbstractSocket::ConnectedState)
+    {
+        QString cmd = ui->leCmd->text();
+        if(ui->cbAddReturn->checkState() == Qt::CheckState::Checked)
+        {
+            cmd += "\r\n";
+        }
+
+        tcpClient->write(ui->leCmd->text().toUtf8());
+    }
 }
